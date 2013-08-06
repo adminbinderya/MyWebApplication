@@ -1,0 +1,4 @@
+name = "Reference tables"
+description = "This table is Tvet project Reference tables"
+core = "7.x"
+version = "7.x-1.0"

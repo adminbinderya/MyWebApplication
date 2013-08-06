@@ -1,0 +1,4 @@
+name = "Reference tabless"
+description = "This table is Tvet project Reference tables binderya"
+core = "7.x"
+version = "7.x-1.0"

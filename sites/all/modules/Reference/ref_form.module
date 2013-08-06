@@ -1,0 +1,223 @@
+﻿<?php
+
+/*
+ * Implements hook permission()
+ */
+function ref_form_permission() {
+  return array(
+		'submit ref form' => array(
+			'title' => t('Submit ref form'),
+			'description' => t('Submit the ref_form form'),
+		),
+		'access ref form submissions' => array(
+			'title' => t('Access ref form submissions'),
+			'description' => t('Access the ref_form submissions'),
+		),
+  );
+}
+
+/*
+ * Implements hook menu()
+ */
+function ref_form_menu() {
+	$item = array();
+	$item['ref-form'] = array(
+		'title' => 'My form',
+		'type' => MENU_NORMAL_ITEM,
+		'access arguments' => array('access ref_form'),
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('ref_form_form'),
+	);
+	$item['partner-submissions'] = array(
+		'title' => 'Patners table',
+		'type' => MENU_NORMAL_ITEM,
+		'access arguments' => array('Access partner_submissions submissions'),
+		'page callback' => 'partner_submissions',
+	);
+/*	$items['form-example/edit'] = array(
+    'title' => 'Edit Page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pages_edit'),
+    'access arguments' => array('access page manager'),
+    'expanded' => TRUE,
+  );*/
+
+	return $item;
+}
+
+/*
+ * My example form
+ */
+function form_example_form($form, &$form_state) {
+
+	$form['mynumber'] = array(
+		'#type' => 'textfield',
+		'#title' => t('My number'),
+		'#size' => 10,
+		'#maxlength' => 10,
+		'#required' => TRUE,
+		'#description' => t('Please enter a valid number'),
+	);
+	
+	$form['mytextfield'] = array(
+		'#type' => 'textfield',
+		'#title' => t('My textfield'),
+		'#size' => 60,
+		'#maxlength' => 120,
+		'#required' => TRUE,
+	);
+	
+	$form['mytext'] = array(
+		'#type' => 'textarea',
+		'#title' => t('My Textarea'),
+		'#description' => t('Enter some text.'),
+		'#default_value' => '',
+		'#required' => TRUE,
+	);
+	
+	$form['submit'] = array(
+		'#type' => 'submit',
+		'#value' => t('Add item'),
+	);
+	
+	return $form;
+}
+
+ /*
+  * Validation handler for the form_example_form
+  */
+function form_example_form_validate($form, $form_state) {
+	//print('<pre>' .print_r($form_state['values'],1). '</pre>');die();
+	if(!is_numeric($form_state['values']['mynumber']))
+	{
+		form_set_error('mynumber', t('You must enter a valid number'));
+		return FALSE;
+	}
+	return TRUE;
+}
+ 
+ /*
+  * Submit handler for the form_example_form. Inserts entry into database.
+  */
+  /*
+function form_example_form_submit($form, $form_state) {
+	
+	$fe_id = db_insert('form_example')
+		->fields(array(
+		'mynumber' => $form_state['values']['mynumber'],
+		'mytextfield' => $form_state['values']['mytextfield'],
+		'mytext' => $form_state['values']['mytext'],
+	))
+	->execute();
+	
+	drupal_set_message(t('Baazad medeelel amjilttai nemegdlee.'));
+	
+}
+*/
+ /*
+  * View the form_example submissions
+  */
+function partner_submissions() {
+
+	// End baazad oor baaztai holboson ba ter baazaa acitve hiij bna.
+	/*db_set_active('external_db');
+	$results = db_query("SELECT * FROM {test}");
+	
+	//$header = array(t('ID'), t('My Number'), t('My Textfield'), t('My Text'));
+	$header = array(t('ID'), t('Name'), t('Operations'));
+	$rows = array();
+	
+	foreach($results AS $result){
+		$rows[] = array(
+			$result->ID,
+			$result->Name,
+			"<a href='#'>" . t('Edit') . "</a> | <a href='#'>" . t('Delete') . "</a>",
+			//"<a href='/form-submissions/Edit'>" . t('Edit') . "</a> | <a href='/form-submissions/delete/{$entry->uid}'>" . t('Delete') . "</a>",
+		);
+	}
+	*/
+	$results = db_query("SELECT * FROM {t_ref_partners}");
+	
+	$header = array(t('ID'), t('Name'), t('Short name'), t('IsInternational'), t('English'));
+	$rows = array();
+	
+	foreach($results AS $result){
+		$rows[] = array(
+			$result->ID,
+			$result->Name,
+			$result->ShortName,
+			$result->IsInternational,
+			$result->Eng,
+		//	l('Edit', 'form_example', array('query' => array('fe_id' => $result->fe_id))),
+			//"<a href='form_example_edit_submit'>" . t('Edit') . "</a> | <a href='#'>" . t('Delete') . "</a>",
+			//l('Edit', 'form_example'. $result->fe_id .''),
+			//l('Edit', array('url' => 'http://drupal:8083/form-example'))
+			//"<a href='/form-submissions/Edit'>" . t('Edit') . "</a> | <a href='/form-submissions/delete/{$entry->uid}'>" . t('Delete') . "</a>",
+			
+		);
+	}
+    
+	return theme('table', array('header' => $header, 'rows' => $rows));	
+}
+
+/*
+ * Ene ni display all submit button
+ */
+ /*
+function form_example_edit_submit($form, &$form_state){
+  
+		$form_state['redirect'] = 'form-example';
+}
+*/
+/*
+ * Edit
+ *
+ */
+
+ /*function pages_edit($form, &$form_submit){
+    
+    if(isset($_GET['fe_id']) && !empty($_GET['fe_id'])){
+    $result = db_query("SELECT * FROM {form_example} WHERE fe_id = {".$_GET['fe_id']."}");
+	
+	//$results = db_query("SELECT * FROM {form_example} WHERE fe_id = :se_name", array(':se_name' => $se_name));
+    $row = array();
+    foreach($result as $record){
+        $row = (array)$record;
+    }
+    }
+    $form['fe_id'] = array(
+        '#value' => $row['fe_id'],
+        '#type' => 'hidden',
+    );
+    $form['mynumber'] = array(
+        '#title' => t('My Number'),
+        '#type' => 'textfield',
+        '#default_value' => $row['mynumber'],
+        '#required' => TRUE,
+        '#description' => t('Name of the page'),
+    );
+    $form['mytextfield'] = array(
+        '#title' => t('Parent Page'),
+        '#type' => 'textfield',
+        '#default_value' =>  $row['mytextfield'],
+        '#description' => t('Select parent page for the current one.'),
+    );
+    $form['mytext'] = array(
+        '#title' => t('mytext'),
+        '#type' => 'textfield',
+        '#default_value' => $row['mytext'],
+        '#cols' => 50,
+        '#rows' => 5,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Submit',
+    );
+    //kpr($form);
+    return $form;
+}
+
+*/
+
+ 
+?>

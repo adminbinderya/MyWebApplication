@@ -1,0 +1,235 @@
+﻿<?php 
+function reference_permission() {
+  return array(
+      'partners reference' => array(
+      'title' => t('Submit for example'),
+      'description' => t('Submit the reference.'),
+    ),
+	  'access reference submissions' => array(
+      'title' => t('access reference submissions'),
+      'description' => t('Access the reference submissions'),
+    ),
+  );
+}
+
+
+function reference_menu() {
+    $items = array();
+$items['partners_submissions'] = array(
+    'title' => 'Partners table',
+	'type' => MENU_NORMAL_ITEM,
+	'access arguments' => array('access partners form'),
+    'page callback' => 'partners_submissions',
+    );
+$items['status_submissions'] = array(
+    'title' => 'Status table',
+	'type' => MENU_NORMAL_ITEM,
+	'access arguments' => array('access status table'),
+    'page callback' => 'status_submissions',
+    );
+$items['categories_submissions'] = array(
+    'title' => 'Categories table',
+	'type' => MENU_NORMAL_ITEM,
+	'access arguments' => array('access categories table'),
+    'page callback' => 'categories_submissions',
+    );
+$items['sectors_submissions'] = array(
+    'title' => 'Sectors table',
+	'type' => MENU_NORMAL_ITEM,
+	'access arguments' => array('access sectors table'),
+    'page callback' => 'sectors_submissions',
+    );
+  $items['partners/%/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('partners_delete_confirm', 1),
+    'access arguments' => array('PERMISSION_TO_CHECK'),
+  );
+   $items['partners/%/edit'] = array(
+    'title' => 'Засах форм',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('partners_edit_confirm', 1),
+    'access arguments' => array('PERMISSION_TO_CHECK'),
+  );
+  return $items;
+}
+
+	 	
+/*  Partners table show */	
+
+function partners_submissions(){
+	$results = db_query("SELECT * FROM {t_ref_partners}");
+	$header = array(t('ID'), t('Name'), t('ShortName'), t('IsInternational'), t('English'), t('Edit'), t('Delete'));
+	$rows = array();
+	foreach($results AS $result){
+	$rows[] = array(
+	$result ->ID,
+	$result ->Name,
+	$result ->ShortName,
+	$result ->IsInternational,
+	$result ->Eng,	
+	l('Edit', 'partners/%/edit', array('query' => array('ID' => $result->ID))),
+	l('Delete', 'partners/%/delete', array('query' => array('ID' => $result->ID))),
+	);
+	}	
+	return theme('table',array('header' => $header, 'rows' => $rows));
+} 
+
+/*
+function partners_form($form, &$form_state){
+    $results = db_query("SELECT * FROM {t_ref_partners}");
+	$header = array(t('ID'), t('Name'), t('ShortName'), t('IsInternational'), t('English'));
+	$rows = array();
+	foreach($results AS $result){
+		$rows[] = array(
+		$result ->ID,
+		$result ->Name,
+		$result ->ShortName,
+		$result ->IsInternational,
+		$result ->Eng,	
+		);
+	}
+	$form['table'] = array(
+	     '#type' => 'tableselect',
+		 '#header' => $header, 
+		 '#options' => $rows,
+		 '#empty' => t( 'No record found'),
+		 );
+	$form['Nemeh']['add'] = array(
+		'#type' => 'submit',
+        '#value' => 'Add'
+	);
+	
+		$form['zasah']['edit'] = array(
+		'#type' => 'submit',
+        '#value' => 'Edit'
+	);
+	
+		$form['ustgah']['delete'] = array(
+		'#type' => 'submit',
+        '#value' => 'Delete'
+	);
+	return $form;
+	
+}
+ */
+ 
+/*  Status table show 	*/
+function status_submissions(){
+	$results = db_query("SELECT * FROM {t_ref_status}");
+	$header = array(t('ID'), t('Name'), t('English'), t('Edit'), t('Delete'));
+	$rows = array();
+	foreach($results AS $result){
+	$rows[] = array(
+	$result ->ID,
+	$result ->Name,
+	$result ->Eng,
+	l('Edit', 'form_example', array('query' => array('ID' => $result->ID))),
+	l('Delete', 'form_example', array('query' => array('ID' => $result->ID))),
+	);
+	} 
+	return theme('table',array('header' => $header, 'rows' => $rows));
+	}	
+	/*  categories table show */	
+function categories_submissions(){
+	$results = db_query("SELECT * FROM {t_ref_categories}");
+	$header = array(t('ID'), t('Name'), t('English'), t('Edit'), t('Delete'));
+	$rows = array();
+	foreach($results AS $result){
+	$rows[] = array(
+	$result ->ID,
+	$result ->Name,
+	$result ->Eng,
+	l('Засах', 'form_example', array('query' => array('ID' => $result->ID))),
+	l('Устгах', 'form_example', array('query' => array('ID' => $result->ID))),
+	);
+	} 
+	return theme('table',array('header' => $header, 'rows' => $rows));
+	}
+	/*  sectors table show */	
+function sectors_submissions(){
+	$results = db_query("SELECT * FROM {t_ref_sectors}");
+	$header = array(t('ID'), t('Name'), t('English'), t('Edit'), t('Delete'));
+	$rows = array();
+	foreach($results AS $result){
+	$rows[] = array(
+	$result ->ID,
+	$result ->Name,
+	$result ->Eng,
+	l('Edit', 'form_example', array('query' => array('ID' => $result->ID))),
+	l('Delete', 'form_example', array('query' => array('ID' => $result->ID))),
+	);
+	} 
+	return theme('table',array('header' => $header, 'rows' => $rows));
+	}
+
+
+/*  Delete  */
+function partners_delete_confirm($form, &$form_state, $ID) {
+  $form['#partners']['ID'] = $ID;
+
+  $Name = partners_get_name_from_id($ID);
+
+  return confirm_form($form,
+    t("Ene %Name? tei hereglegchiig ustgalaa", array('%Name' => $Name)),
+    '<front>',
+    t("This action cannot be undone."),
+    t("Delete"),
+    t("Cancel")
+  );
+}
+
+function partners_delete_confirm_submit($form, &$form_state) {
+  if (isset($form['#partners']['ID'])) {
+    $ID = $form['#partners']['ID'];
+    db_delete('t_ref_partners')
+      ->condition('ID', $ID)
+      ->execute();
+  }
+}
+function partners_get_name_from_id($ID) {
+  return 'thingy ' . $ID;
+}
+
+/*  Edit */
+function partners_edit_confirm($form, &$form_state, $ID) {
+ // $form['#partners']['ID'] = $ID;
+
+//  partners_get_name_from_id($ID);
+  
+  $form['ID'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('ID'),
+	 '#size' => 60,
+	 '#maxlenght' => 30,
+	 '#required' => TRUE,
+	 );
+  $form['Name'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('Name'),
+	 '#size' => 60,
+	 '#maxlenght' => 30,
+	 '#required' => TRUE,
+	 '#description' => t('Ner oruulna uu. '),
+	 );
+  $form['ShortName'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('ShortName'),
+	 '#size' => 60,
+	 '#maxlenght' => 30,
+	 '#required' => TRUE,
+	 '#description' => t('Ner oruulna uu. '),
+	 );
+  $form['submit'] = array(
+	 '#type' => 'submit',
+     '#value' => t('Хадгалах'),
+	 );
+  $form['bolih'] = array(
+	 '#type' => 'submit',
+     '#value' => t('Болих'),
+	 );	 
+	 return $form;
+}
+
+/*http://drupal.stackexchange.com/questions/37938/custom-table-view-delete-edit-row-d7  */
+?>

@@ -1,0 +1,4 @@
+name = "Add form"
+description = "Reference table add record"
+core = "7.x"
+version = "7.x-1.0"

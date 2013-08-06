@@ -1,0 +1,95 @@
+﻿<?php 
+function Add_form_permission() {
+  return array(
+    'submit Add' => array(
+      'title' => t('Submit for example'),
+      'description' => t('Submit the Add.'),
+    ),
+	  'access userscomment submissions' => array(
+      'title' => t('access usercomment submissions'),
+      'description' => t('Access the usercomment submissions'),
+    ),
+  );
+}
+
+function Add_menu() {
+    $items = array();
+	$items['Add'] = array(
+    'title' => 'Add form',
+	'type' => MENU_NORMAL_ITEM,
+	'access arguments' => array('submit Add'),
+    'page callback' => 'drupal_get_form',
+	'page arguments' => array('Add_form'),
+    );
+
+  return $items;
+}
+
+function Add_form($form, &$form_state){
+
+     $form['Name'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('Name'),
+	 '#size' => 60,
+	 '#maxlenght' => 30,
+	 '#required' => TRUE,
+	 '#description' => t('Ner oruulna uu. '),
+	 );
+	 
+     $form['ShortName'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('ShortName'),
+	 '#size' => 60,
+	 '#maxlenght' => 30,
+	 '#required' => TRUE,
+	 '#description' => t('Tovchilson nere oruulna uu. '),
+	 ); 
+	 
+	 $form['IsInternational'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('IsInternational'),
+	 '#size' => 10,
+	 '#maxlenght' => 6,
+	 '#required' => TRUE,
+	 '#description' => t('.., '),
+	 );
+	 
+     $form['eng'] = array(
+	 '#type' => 'textfield',
+     '#title' => t('eng'),
+	 '#size' => 10,
+	 '#maxlenght' => 3,
+	 '#required' => TRUE,
+	 '#description' => t('Translate oruulna uu. '),
+	 );
+
+     $form['submit'] = array(
+	 '#type' => 'submit',
+     '#value' => t('Хадгалах'),
+	 );
+	 return $form;
+	 }
+	 
+	 
+	 function Add_form_validate($form, &$form_state){
+	 //print('<pre>'.print_r(storm_state['values'],1),'</pre>');die();
+	 if(!is_numeric($form_state['values']['IsInternational'])){
+	   form_set_error('IsInternational',t('IsInternational бол зөвхөн 1 эсвэл 2 байна ???'));
+	   return FALSE;
+	   }
+	    return TRUE;
+	}
+    function Add_form_submit($form, &$form_state){
+	$fe_id = db_insert('t_ref_partners')
+	 ->fields(array(
+	 'Name' => $form_state['values']['Name'],
+	 'ShortName' => $form_state['values']['ShortName'],
+	 'IsInternational' => $form_state['values']['IsInternational'],
+	 'eng' => $form_state['values']['eng'],
+	 ))
+	 ->execute();
+	 
+	// drupal_set_messege(t('Good luck gogogogo.')); 
+    }
+
+?>
